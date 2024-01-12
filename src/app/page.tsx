@@ -1,95 +1,50 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client'; // src/App.tsx
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
-export default function Home() {
+// Styled components
+const AppContainer = styled.div<{ animationStarted: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  ${({ animationStarted }) =>
+    animationStarted &&
+    css`
+      background-color: #3498db;
+      transition: background-color 2s ease-in-out;
+    `}
+`;
+
+const StartButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+`;
+
+const App: React.FC = () => {
+  const [animationStarted, setAnimationStarted] = useState(false);
+
+  const startAnimation = () => {
+    setAnimationStarted(true);
+
+    document.body.classList.add('wave-animation');
+
+    const currentDateTime = new Date().toLocaleString();
+    const existingDateTimes = JSON.parse(
+      localStorage.getItem('dateTimes') || '[]'
+    );
+    const updatedDateTimes = [...existingDateTimes, currentDateTime];
+    localStorage.setItem('dateTimes', JSON.stringify(updatedDateTimes));
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
+      <AppContainer animationStarted={animationStarted}>
+        <StartButton onClick={startAnimation}>Start Animation</StartButton>
+      </AppContainer>
+    </>
+  );
+};
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
-}
+export default App;
