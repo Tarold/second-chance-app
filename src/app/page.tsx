@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Tooltip } from 'react-tooltip';
 import AppContainer from './components/AppContainer';
 import Counter from './components/Counter';
 import StartButton from './components/StartButton';
