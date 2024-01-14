@@ -1,8 +1,24 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import chroma from 'chroma-js';
+import { animTime } from '../constants';
 
-const Container = styled.div<{ animationstarted: boolean }>`
+const fadeInOut = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
+const Container = styled.div<{ animationStarted: boolean }>`
+  background-color: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,42 +26,40 @@ const Container = styled.div<{ animationstarted: boolean }>`
   position: relative;
   overflow: hidden;
   transition: background-color 1s ease-in-out;
-  ${({ animationstarted }) =>
-    animationstarted &&
-    css`
-      & > ${Circle} {
-        opacity: 0.1;
-
-        transform: scale(1);
-        transition: 2s ease-in-out;
-      }
-    `}
 `;
 
-const Circle = styled.div<{ size: string; color: string; delay: string }>`
+const Circle = styled.div<{
+  animationstarted: boolean;
+  size: number;
+  color: string;
+  delay: number;
+}>`
   position: absolute;
   width: 100px;
   height: 100px;
   border-radius: 50%;
   background-color: #3498db;
-  z-index: -1;
-  transform: scale(0);
+  z-index: 2;
   opacity: 0;
+  animation-fill-mode: both;
 
   ${({ size }) =>
     size &&
     css`
-      width: ${size};
-      height: ${size};
+      width: ${size}px;
+      height: ${size}px;
     `}
   ${({ color }) =>
     color &&
     css`
       background-color: ${color};
     `}
-  ${({ delay }) =>
+  
+  ${({ delay, animationstarted }) =>
+    animationstarted &&
     css`
-      transition-delay: ${delay};
+      animation: ${fadeInOut} ${animTime}s ease-in-out infinite;
+      animation-delay: ${delay}s;
     `}
 `;
 
@@ -60,8 +74,8 @@ const createList = (
 
   for (let i = 0; i < numItems; i++) {
     const color = gradient(i / (numItems - 1)).hex();
-    const radius = `${(numItems - i) * 70}px`;
-    const delay = `${i * 0.1}s`;
+    const radius = 18 + (numItems - i) * 10;
+    const delay = i * 0.1;
 
     list.push({
       color,
@@ -72,8 +86,6 @@ const createList = (
   return list;
 };
 
-const list = createList(30);
-
 const AppContainer = ({
   animationStarted,
   children,
@@ -81,16 +93,24 @@ const AppContainer = ({
   animationStarted: boolean;
   children: React.ReactNode;
 }) => (
-  <Container animationstarted={animationStarted}>
-    {list.map((item, index) => (
+  <Container animationStarted={animationStarted}>
+    {createList(30).map((item, index) => (
       <Circle
+        animationstarted={animationStarted}
         key={index}
         size={item.radius}
         color={item.color}
         delay={item.delay}
       ></Circle>
     ))}
-    {children}
+    <Circle
+      animationstarted={animationStarted}
+      key={'index'}
+      size={createList(30)[0].radius}
+      color={'white'}
+      delay={animTime / 6}
+    ></Circle>
+    <div style={{ zIndex: 3 }}>{children}</div>
   </Container>
 );
 
