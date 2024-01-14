@@ -1,23 +1,25 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import chroma from 'chroma-js';
-import { animTime } from '../constants';
+import {
+  animCirclesCount,
+  animDelay,
+  animDelayWhiteCircles,
+  animTime,
+} from '../constants';
 
 const fadeInOut = keyframes`
   0% {
     opacity: 0;
-    transform: scale(0);
-  }
-  80% {
-    opacity: 1;
-    transform: scale(1);
+    transform: scale(0.2);
   }
   100% {
     opacity: 1;
+    transform: scale(1);
   }
 `;
 
-const Container = styled.div<{ animationStarted: boolean }>`
+const Container = styled.div`
   background-color: white;
   display: flex;
   justify-content: center;
@@ -25,7 +27,7 @@ const Container = styled.div<{ animationStarted: boolean }>`
   height: 100vh;
   position: relative;
   overflow: hidden;
-  transition: background-color 1s ease-in-out;
+  transition: background-color 1s ease-out;
 `;
 
 const Circle = styled.div<{
@@ -33,6 +35,7 @@ const Circle = styled.div<{
   size: number;
   color: string;
   delay: number;
+  animtime?: number;
 }>`
   position: absolute;
   width: 100px;
@@ -54,11 +57,11 @@ const Circle = styled.div<{
     css`
       background-color: ${color};
     `}
-  
-  ${({ delay, animationstarted }) =>
+  ${({ delay, animationstarted, animtime }) =>
     animationstarted &&
     css`
-      animation: ${fadeInOut} ${animTime}s ease-in-out infinite;
+      animation: ${fadeInOut} ${animtime ? animtime : animTime}s ease-out
+        forwards;
       animation-delay: ${delay}s;
     `}
 `;
@@ -74,8 +77,8 @@ const createList = (
 
   for (let i = 0; i < numItems; i++) {
     const color = gradient(i / (numItems - 1)).hex();
-    const radius = 18 + (numItems - i) * 10;
-    const delay = i * 0.1;
+    const radius = 250 - i * 6;
+    const delay = i * animDelay;
 
     list.push({
       color,
@@ -83,8 +86,18 @@ const createList = (
       delay,
     });
   }
+  list.push({
+    color: 'inherit',
+    radius: 252,
+    animtime: (animTime / 3) * 2,
+    delay: animDelayWhiteCircles,
+  });
   return list;
 };
+
+const ChildrenContainer = styled.div`
+  z-index: 5;
+`;
 
 const AppContainer = ({
   animationStarted,
@@ -93,24 +106,18 @@ const AppContainer = ({
   animationStarted: boolean;
   children: React.ReactNode;
 }) => (
-  <Container animationStarted={animationStarted}>
-    {createList(30).map((item, index) => (
+  <Container>
+    {createList(animCirclesCount).map((item, index) => (
       <Circle
         animationstarted={animationStarted}
         key={index}
         size={item.radius}
         color={item.color}
         delay={item.delay}
+        animtime={item.animtime}
       ></Circle>
     ))}
-    <Circle
-      animationstarted={animationStarted}
-      key={'index'}
-      size={createList(30)[0].radius}
-      color={'white'}
-      delay={animTime / 6}
-    ></Circle>
-    <div style={{ zIndex: 3 }}>{children}</div>
+    <ChildrenContainer>{children}</ChildrenContainer>
   </Container>
 );
 
