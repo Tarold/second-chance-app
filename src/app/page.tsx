@@ -4,6 +4,7 @@ import AppContainer from './components/AppContainer';
 import Counter from './components/Counter';
 import StartButton from './components/StartButton';
 import { useLocalStorage } from '@uidotdev/usehooks';
+import { animTime } from './constants';
 
 const App: React.FC = () => {
   const [animationStarted, setAnimationStarted] = useState(false);
@@ -21,7 +22,6 @@ const App: React.FC = () => {
 
   const startAnimation = () => {
     setAnimationStarted(true);
-    document.body.classList.add('wave-animation');
 
     const currentDate = new Date().toDateString();
     const currentTime = new Date().toTimeString();
@@ -33,8 +33,7 @@ const App: React.FC = () => {
 
     setTimeout(() => {
       setAnimationStarted(false);
-      document.body.classList.remove('wave-animation');
-    }, 2000);
+    }, animTime * 1000);
   };
 
   const timesForToday = dateTimes[new Date().toDateString()] || [];
